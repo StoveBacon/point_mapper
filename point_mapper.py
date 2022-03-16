@@ -134,15 +134,23 @@ def solve(file):
 
     return points
 
-# Creates tringles between every point
+# Tends to create triangles between points, sensitive to input data
+# Algorithm steps:
+# For each point, compute its distance to every other point,
+# Filter out points that already have connections, get the closest 2 points,
+# Update the connected dict for future iterations
 def triangles(points):
-    seen = {}
+    connections = {}
     for id, pos in points.items():
-        dists = [(i, math.dist(pos, p)) for i, p in points.items() if i != id]
-        unseen = [(i, p) for i, p in dists if seen.get(i) is None or id not in seen.get(i)]
-        close = sorted(unseen, key=lambda p: p[1])[:2]
-        seen[id] = [i[0] for i in close]
-    return seen
+        distances = [(i, math.dist(pos, p)) for i, p in points.items() if i != id]
+        unconnected = [
+            (i, p) for i, p in distances
+            if connections.get(i) is None or
+            id not in connections.get(i)
+        ]
+        close_points = sorted(unconnected, key=lambda p: p[1])[:2]
+        connections[id] = [i[0] for i in close_points]
+    return connections
 
 def main():
     parser = argparse.ArgumentParser()
