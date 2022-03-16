@@ -1,4 +1,5 @@
 from collections import namedtuple
+import argparse
 import csv
 import math
 
@@ -118,8 +119,8 @@ def solve_initial(data):
 
     return points
 
-def solve():
-    data = load_data('data.csv')
+def solve(file):
+    data = load_data(file)
     points = solve_initial(data)
 
     # We've already checked the first 3 points
@@ -143,10 +144,25 @@ def triangles(points):
         seen[id] = [i[0] for i in close]
     return seen
 
-locs = solve()
-print("\n".join(map("Point: {0}, Position: {1}".format, locs, locs.values())))
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("infile", help=".csv file containing point data")
+    parser.add_argument("-p", "--print", help="print the points to the console", action="store_true")
+    parser.add_argument("-c", "--csv", help="write output to .csv file", action="store_true")
+    parser.add_argument("-s", "--scad", help="write output to .scad file", action="store_true")
+    parser.add_argument("-t", "--tris", help="calculate tris and write them to a .scad file", action="store_true")
+    args = parser.parse_args()
 
-#write_csv(locs)
-# write_scad(locs)
-# tris = triangles(locs)
-# write_tris_scad(tris)
+    points = solve(args.infile)
+    if args.print:
+        print("\n".join(map("Point: {0}, Position: {1}".format, points, points.values())))
+    if args.csv:
+        write_csv(points)
+    if args.scad:
+        write_scad(points)
+    if args.tris:
+        tris = triangles(points)
+        write_tris_scad(tris)
+
+if __name__ == '__main__':
+    main()
